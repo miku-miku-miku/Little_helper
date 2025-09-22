@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>电商工具整合平台</title>
+		<script src="jquery-3.7.1.min.js"></script>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<style>
+			.table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 1200px;
+        }
+        .small-input {
+            width: 120px;
+            padding: 2px 4px;
+            font-size: 12px;
+        }
+        .small-btn {
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+    </style>
+		<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+		<script>
+			$(function(){
+				var settings = {
+				   "url": "https://mycst.cn//NEWKP/LOGIN/GetToken?UserName=SHGLY_L&Password1=Aa@123654",
+				   "method": "POST",
+				   "timeout": 0,
+				};
+				
+				$.ajax(settings).done(function (response) {
+					 // 示例：获取后存储为全局变量
+					 window.youtoken = response.ID;
+					 localStorage.setItem("youtoken",youtoken);
+					 console.log(youtoken);
+					  const iframe = document.getElementById('SCCRMBG');
+					     // 保存当前iframe的src地址
+					     const currentSrc = iframe.src;
+					     // 先将src设为空（触发刷新）
+					     iframe.src = 'about:blank';
+					     // 再恢复原地址（带token参数的地址会重新加载）
+					     setTimeout(() => {
+					         iframe.src = currentSrc;
+					     }, 0);
+				});
+			})
+			// 页面加载完成后绑定新按钮事件
+			document.addEventListener('DOMContentLoaded', function() {
+			    // 获取Token按钮（预留位置，你可以在这里添加自己的逻辑）
+			    document.getElementById('getTokenBtn').addEventListener('click', function() {
+			        // 这里是获取Token的逻辑，你可以自行实现
+			        var settings = {
+			           "url": "https://mycst.cn//NEWKP/LOGIN/GetToken?UserName=SHGLY_L&Password1=Aa@123654",
+			           "method": "POST",
+			           "timeout": 0,
+			        };
+			        
+			        $.ajax(settings).done(function (response) {
+						 // 示例：获取后存储为全局变量
+						 window.youtoken = response.ID;
+						 localStorage.setItem("youtoken",youtoken);
+						  const iframe = document.getElementById('SCCRMBG');
+						     // 保存当前iframe的src地址
+						     const currentSrc = iframe.src;
+						     // 先将src设为空（触发刷新）
+						     iframe.src = 'about:blank';
+						     // 再恢复原地址（带token参数的地址会重新加载）
+						     setTimeout(() => {
+						         iframe.src = currentSrc;
+						     }, 0);
+			        });
+			       
+			       
+			    });
+			
+			    // 显示更新日志按钮
+			    document.getElementById('showChangelogBtn').addEventListener('click', function() {
+			        loadChangelog();
+			        document.getElementById('changelogModal').classList.remove('hidden');
+			    });
+			
+			    // 关闭更新日志按钮
+			    document.getElementById('closeChangelogBtn').addEventListener('click', function() {
+			        document.getElementById('changelogModal').classList.add('hidden');
+			    });
+			    document.getElementById('closeChangelogBtn2').addEventListener('click', function() {
+			        document.getElementById('changelogModal').classList.add('hidden');
+			    });
+			
+			    // 点击弹窗外部关闭
+			    document.getElementById('changelogModal').addEventListener('click', function(e) {
+			        if (e.target === this) {
+			            this.classList.add('hidden');
+			        }
+			    });
+			});
+			
+			// 加载README.md文件内容
+			function loadChangelog() {
+			    const contentElem = document.getElementById('changelogContent');
+			    
+			    // 显示加载状态
+			    contentElem.innerHTML = '<div class="flex items-center justify-center h-40 text-gray-500"><i class="fa fa-spinner fa-spin mr-2"></i>加载更新日志中...</div>';
+			    
+			    // 读取同目录下的README.md文件
+			    fetch('README.md')
+			        .then(response => {
+			            if (!response.ok) {
+			                throw new Error('无法加载更新日志');
+			            }
+			            return response.text();
+			        })
+			        .then(text => {
+			            // 将Markdown转换为HTML显示（简单处理）
+			            const html = markdownToHtml(text);
+			            contentElem.innerHTML = html;
+			        })
+			        .catch(error => {
+			            contentElem.innerHTML = `<div class="text-red-500 p-4 text-center">
+			                <i class="fa fa-exclamation-circle mr-2"></i>
+			                加载失败：${error.message}
+			                <p class="mt-2 text-sm text-gray-500">请确保README.md文件在同一目录下</p>
+			            </div>`;
+			        });
+			}
+			
+			// 简单的Markdown转HTML处理
+			function markdownToHtml(markdown) {
+			    // 处理标题
+			    let html = markdown.replace(/#{6}\s(.*?)\n/g, '<h6 class="text-lg font-semibold mt-4 mb-2">$1</h6>');
+			    html = html.replace(/#{5}\s(.*?)\n/g, '<h5 class="text-lg font-semibold mt-4 mb-2">$1</h5>');
+			    html = html.replace(/#{4}\s(.*?)\n/g, '<h4 class="text-lg font-semibold mt-4 mb-2">$1</h4>');
+			    html = html.replace(/#{3}\s(.*?)\n/g, '<h3 class="text-xl font-semibold mt-4 mb-2">$1</h3>');
+			    html = html.replace(/#{2}\s(.*?)\n/g, '<h2 class="text-2xl font-semibold mt-6 mb-3">$1</h2>');
+			    html = html.replace(/#\s(.*?)\n/g, '<h1 class="text-3xl font-bold mt-8 mb-4">$1</h1>');
+			    
+			    // 处理段落
+			    html = html.replace(/(^[^<\n].*?)(?=\n|$)/g, '<p class="mb-3">$1</p>');
+			    
+			    // 处理列表
+			    html = html.replace(/^- (.*?)$/gm, '<li class="ml-6 mb-1">$1</li>');
+			    html = html.replace(/(<li.*?<\/li>)\s+(?=<li)/gs, '$1');
+			    html = html.replace(/(<li.*?<\/li>+)/gs, '<ul class="list-disc mb-4">$1</ul>');
+			    
+			    // 处理粗体
+			    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+			    
+			    // 处理链接
+			    html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-blue-600 hover:underline">$1</a>');
+			    
+			    return html;
+			}
+			// 平台和链接数据（订购区分正式/试用，授权不区分）
+        const PLATFORMS = {
+            jd: {
+                name: "京东",
+                order: {
+                    officialUrl: "https://fw.jd.com/main/detail/FW_GOODS-646813",
+                    trialUrl: "https://fw.jd.com/main/detail/FW_GOODS-1910804?p=fw&t=searchbutton"
+                },
+                hasTrial: true // 支持试用版
+            },
+            tmall: {
+                name: "天猫",
+                order: {
+                    officialUrl: "https://fuwu.taobao.com/ser/detail.htm?service_code=FW_GOODS-1001259578",
+                    trialUrl: "https://fuwu.taobao.com/ser/detail.htm?service_code=FW_GOODS-1001259578"
+                },
+                hasTrial: true // 支持试用版
+            },
+            taobao: {
+                name: "淘宝",
+                order: {
+                    officialUrl: "https://fuwu.taobao.com/ser/detail.htm?service_code=FW_GOODS-1001259578",
+                    trialUrl: "https://fuwu.taobao.com/ser/detail.htm?service_code=FW_GOODS-1001259578"
+                },
+                hasTrial: true // 支持试用版，与天猫相同
+            },
+            pinduoduo: {
+                name: "拼多多",
+                order: {
+                    officialUrl: "https://fuwu.pinduoduo.com/service-market/service-detail?detailId=86573",
+                    trialUrl: "https://fuwu.pinduoduo.com/service-market/service-detail?detailId=86573"
+                },
+                hasTrial: true // 支持试用版
+            },
+            douyin: {
+                name: "抖音",
+                order: {
+                    officialUrl: "https://fuwu.jinritemai.com/detail?service_id=21291&from=fuwu_market_service_list",
+                    trialUrl: ""
+                },
+                hasTrial: false
+            },
+            youzan: {
+                name: "有赞",
+                order: {
+                    officialUrl: "https://yingyong.youzan.com/cloud-app-detail/80486",
+                    trialUrl: ""
+                },
+                hasTrial: false
+            },
+            kuaishou: {
+                name: "快手",
+                order: {
+                    officialUrl: "https://fuwu.kwaixiaodian.com/new/detail?id=21156288793273",
+                    trialUrl: ""
+                },
+                hasTrial: false
+            },
+            alibaba: {
+                name: "1688",
+                order: {
+                    officialUrl: "https://pc.1688.com/product/detail.htm?spm=a260s.11177607.jcrmedqi.5.458d646b7sr7Ui&productCode=MvxMuZAZNPG3OS2vdLXBfFQ4PqwSHx4Xbyb0CyO2eMY%3D&productType=GROUP&keywords=%E7%94%B5%E5%AD%90%E5%8F%91%E7%A5%A8",
+                    trialUrl: ""
+                },
+                hasTrial: false
+            },
+            jushuitan: {
+                name: "聚水潭",
+                order: {
+                    officialUrl: "https://fuwu.taobao.com/ser/detail.htm?spm=a1z13.pc_search_result.1234-fwlb.5.40a05acaAUk8KG&service_code=FW_GOODS-1000007023&tracelog=search&from_key=%E8%81%9A%E6%B0%B4%E6%BD%AD",
+                    trialUrl: ""
+                },
+                hasTrial: false
+            },
+            douyinRetail: {
+                name: "抖音及时零售",
+                order: {
+                    officialUrl: "https://fuwu.jinritemai.com/detail?from=open_partner_svcList&service_id=35430",
+                    trialUrl: "https://fuwu.jinritemai.com/detail?from=open_partner_svcList&service_id=35430"
+                },
+                hasTrial: false
+            }
+        };
+
+        // 话术模板（区分正式版/试用版，按平台定制）
+        const SCRIPT_TEMPLATES = {
+            // 授权话术（固定格式：链接+换行+文字）
+            auth: "麻烦使用【{{platformName}}】的【{{shopName}}】店铺主账号登录进这个链接授权一下，授权好以后的信息给截图看一下{{pddExtra}}",
+            
+            // 订购话术（区分正式版/试用版）
+            order: {
+                jd: {
+                    official: "请使用京东的【{{shopName}}】店铺主账号订购【初级版一年】。支付二维码发出来，由我们这边扫码支付费用144元",
+                    trial: "请使用京东【{{shopName}}】京东店铺主账号购买【免费试用十五天】。"
+                },
+                tmall: {
+                    official: "请使用【天猫】的【{{shopName}}】店铺主账号进行订购【乐企_限资版】。支付二维码发出来，由我们这边扫码支付费用600元。",
+                    trial: "请使用【{{shopName}}】天猫店铺主账号购买试用版【轻量版】。"
+                },
+                taobao: {
+                    official: "请使用【淘宝】的【{{shopName}}】店铺主账号进行订购【乐企_限资版】。支付二维码发出来，由我们这边扫码支付费用600元。",
+                    trial: "请使用【{{shopName}}】淘宝店铺主账号购买试用版【轻量版】。"
+                },
+                pinduoduo: {
+                    official: "请使用【拼多多】的【{{shopName}}】店铺主账号进行订购。支付二维码发出来，由我们这边扫码支付费用1000元。",
+                    trial: "请使用【{{shopName}}】拼多多店铺主账号购买【基础版】【七天】。"
+                },
+                douyin: {
+                    official: "请使用【抖音】的【{{shopName}}】店铺主账号进行订购[订单管理版1年]。支付二维码发出来，由我们这边扫码支付费用15元。",
+                    trial: "请使用【抖音】的【{{shopName}}】店铺主账号进行订购[订单管理版1年]。支付二维码发出来，由我们这边扫码支付费用15元。"
+                },
+                youzan: {
+                    official: "请使用【有赞】的【{{shopName}}】店铺主账号进行订购[连锁版(每店)]。支付二维码发出来，由我们这边扫码支付费用799元。",
+                    trial: "请使用【有赞】的【{{shopName}}】店铺主账号进行订购。支付二维码发出来，由我们这边扫码支付费用。"
+                },
+                kuaishou: {
+                    official: "请使用【快手】的【{{shopName}}】店铺主账号进行订购【专业版 一年】。支付二维码发出来，由我们这边扫码支付费用180元。",
+                    trial: "请使用【快手】的【{{shopName}}】店铺主账号进行订购。支付二维码发出来，由我们这边扫码支付费用。"
+                },
+                alibaba: {
+                    official: "请使用【1688】的【{{shopName}}】店铺主账号进行订购一年。支付二维码发出来，由我们这边扫码支付费用1495元。",
+                    trial: "请使用【1688】的【{{shopName}}】店铺主账号进行订购。支付二维码发出来，由我们这边扫码支付费用。"
+                },
+                jushuitan: {
+                    official: "请使用【聚水潭】的【{{shopName}}】店铺主账号进行订购。支付二维码发出来，由我们这边扫码支付费用。",
+                    trial: "请使用【聚水潭】的【{{shopName}}】店铺主账号进行订购。支付二维码发出来，由我们这边扫码支付费用。"
+                },
+                douyinRetail: {
+                    official: "请使用【抖音及时零售】的【{{shopName}}】店铺主账号进行订购【数电版 1年】。支付二维码发出来，由我们这边扫码支付费用1499。",
+                    trial: "请使用【抖音及时零售】的【{{shopName}}】店铺主账号订购试用。"
+                }
+            }
+        };
+
+        // 京东授权链接处理配置
+        const JD_APP_KEY = "272360321C3863E8405AC6EBD57A9A64";
+        const JD_SUFFIX = "_272360321C3863E8405AC6EBD57A9A64";
+
+        // 价格映射表（只保留正式版，无"元"单位）
+        const PRICE_MAP = {
+            "京东": 144,
+            "天猫": 600,
+            "淘宝": 600,  // 淘宝与天猫价格一致
+            "拼多多": 1000,
+            "抖音": 15,
+            "有赞": 799,
+            "快手": 180,
+            "1688": 1495,
+            "抖音及时零售": 1499
+        };
+
+        // 页面加载完成初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initGlobalPlatformSelect();
+            initTabs();
+            bindEvents();
+            updateOrderVersionSelect();
+            updateOrderLink();
+            loadSettings();
+        });
+
+        // 初始化全局平台选择下拉框
+        function initGlobalPlatformSelect() {
+            const globalPlatform = document.getElementById('globalPlatform');
+            
+            globalPlatform.innerHTML = '<option value="">-- 请选择平台 --</option>';
+            
+            Object.keys(PLATFORMS).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = PLATFORMS[key].name;
+                
+                globalPlatform.appendChild(option.cloneNode(true));
+            });
+        }
+
+        // 初始化标签切换
+        function initTabs() {
+            document.querySelectorAll('.main-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.main-tab').forEach(t => {
+                        t.classList.remove('bg-indigo-600', 'text-white');
+                        t.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-gray-200', 'text-gray-700');
+                    this.classList.add('bg-indigo-600', 'text-white');
+                    
+                    const target = this.getAttribute('data-target');
+                    document.querySelectorAll('.main-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    document.getElementById(target).classList.remove('hidden');
+                });
+            });
+        }
+
+        // 绑定事件监听
+        function bindEvents() {
+            // 全局平台和店铺名称变更事件
+            document.getElementById('globalPlatform').addEventListener('change', function() {
+                const platformValue = this.value;
+                saveSetting('lastGlobalPlatform', platformValue);
+                updateOrderVersionSelect();
+                updateOrderLink();
+            });
+            
+            // 版本选择变更事件
+            document.getElementById('orderVersion').addEventListener('change', function() {
+                saveSetting('lastOrderVersion', this.value);
+                updateOrderVersionSelect();
+                updateOrderLink();
+            });
+            
+            document.getElementById('globalShopName').addEventListener('change', function() {
+                saveSetting('lastShopName', this.value);
+            });
+
+            // 授权模块
+            document.getElementById('generateAuthBtn').addEventListener('click', generateAuthScript);
+            document.getElementById('copyAuthBtn').addEventListener('click', () => copyResult('authResult', 'authMessage'));
+            document.getElementById('clearAuthBtn').addEventListener('click', () => clearForm('auth'));
+            
+            // 订购模块
+            document.getElementById('generateOrderBtn').addEventListener('click', generateOrderScript);
+            document.getElementById('copyOrderBtn').addEventListener('click', () => copyResult('orderResult', 'orderMessage'));
+            document.getElementById('clearOrderBtn').addEventListener('click', () => clearForm('order'));
+            
+            // 添加生成表格按钮事件（从订购话术传递参数到表格）
+            document.getElementById('generateTableFromOrderBtn').addEventListener('click', function() {
+                // 获取全局平台和店铺名称
+                const orderPlatformKey = document.getElementById('globalPlatform').value;
+                const shopName = document.getElementById('globalShopName').value.trim();
+                
+                if (!orderPlatformKey) {
+                    showMessage(document.getElementById('orderMessage'), '请先选择平台', 'error');
+                    return;
+                }
+                
+                if (!shopName) {
+                    showMessage(document.getElementById('orderMessage'), '请先输入店铺名称', 'error');
+                    return;
+                }
+                
+                // 切换到表格标签页
+                document.querySelector('[data-target="tableTab"]').click();
+            });
+            
+            // 回车键触发
+            document.getElementById('authLink').addEventListener('keyup', e => e.key === 'Enter' && generateAuthScript());
+            document.getElementById('globalShopName').addEventListener('keyup', e => {
+                if (e.key === 'Enter') {
+                    const activeTab = document.querySelector('.main-tab.bg-indigo-600').getAttribute('data-target');
+                    if (activeTab === 'authTab') generateAuthScript();
+                    if (activeTab === 'orderTab') generateOrderScript();
+                }
+            });
+
+            // 表格生成模块
+            const orderForm = document.getElementById('orderForm');
+            const orderTableBody = document.getElementById('orderTableBody');
+            const copyTableBtn = document.getElementById('copyTableBtn');
+
+            orderForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                // 获取表单输入值
+                const customerName = document.getElementById('customerName').value || ''; // 允许为空
+                const ownership = document.getElementById('ownership').value || ''; // 归属信息
+                
+                // 获取全局选择的平台和店铺名称
+                const platformKey = document.getElementById('globalPlatform').value;
+                const shopName = document.getElementById('globalShopName').value.trim();
+                
+                // 校验必填项
+                if (!platformKey) {
+                    showMessage(document.getElementById('tableMessage'), '请在左侧选择平台', 'error');
+                    return;
+                }
+                
+                if (!shopName) {
+                    showMessage(document.getElementById('tableMessage'), '请在左侧输入店铺名称', 'error');
+                    return;
+                }
+                
+                // 获取平台显示名称
+                const platformType = PLATFORMS[platformKey].name;
+                
+                // 获取设置的默认值
+                const settings = getSettings();
+                const defaultApplicant = settings.defaultApplicant || '';
+                const defaultPayer = settings.defaultPayer || '';
+
+                // 获取自动计算的出帐金额（无"元"单位）
+                const amount = PRICE_MAP[platformType] || "";
+                // 获取今天日期
+                const today = getTodayDate();
+
+                // 清空表格中已有的行（只保留最新一行）
+                orderTableBody.innerHTML = '';
+
+                // 创建新表格行
+                const newRow = document.createElement('tr');
+                newRow.className = "hover:bg-gray-50";
+                newRow.innerHTML = `
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600"></td> <!-- 付款日期 - 空 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">${defaultPayer}</td> <!-- 付款人 - 默认值 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">${today}</td> <!-- 申请日期 - 今天 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">${customerName}</td> <!-- 客户名称 - 可为空 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">支付公司电商平台费用</td> <!-- 资金用处 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600 font-medium">${platformType}</td> <!-- 平台类型 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600 font-medium">${shopName}</td> <!-- 店铺名称 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">${ownership}</td> <!-- 归属 - 新增字段 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600 font-medium">${amount}</td> <!-- 出帐金额（无单位） -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600 font-medium">${document.getElementById('orderVersion').value === 'trial' ? '试用' : '正式'}</td> <!-- 版本 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">${defaultApplicant}</td> <!-- 申请人 - 默认值 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600"></td> <!-- 备注 - 空 -->
+                    <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600"></td> <!-- 是否结算 - 空 -->
+                `;
+
+                // 添加到表格
+                orderTableBody.appendChild(newRow);
+
+                // 启用复制按钮
+                copyTableBtn.disabled = false;
+                copyTableBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
+
+            // 保存默认值按钮事件
+            document.getElementById('saveDefaultsBtn').addEventListener('click', function() {
+                const applicant = document.getElementById('defaultApplicant').value.trim();
+                const payer = document.getElementById('defaultPayer').value.trim();
+                
+                if (applicant) saveSetting('defaultApplicant', applicant);
+                if (payer) saveSetting('defaultPayer', payer);
+                
+                const messageElem = document.getElementById('settingsMessage');
+                messageElem.textContent = '已保存';
+                messageElem.className = 'text-xs text-green-600';
+                
+                setTimeout(() => {
+                    messageElem.textContent = '';
+                }, 1500);
+            });
+
+            // 复制表格内容功能（不复制表头）
+            copyTableBtn.addEventListener('click', function() {
+                const rows = orderTableBody.querySelectorAll('tr');
+                let copyText = "";
+
+                // 只复制tbody中的内容，不包含表头
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const cellValues = Array.from(cells).map(cell => cell.textContent.trim() || "");
+                    copyText += cellValues.join('\t') + '\n';
+                });
+
+                // 创建临时文本域用于复制
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.value = copyText;
+                document.body.appendChild(tempTextarea);
+                tempTextarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextarea);
+
+                // 提示复制成功
+                copyText = "";
+                copyTableBtn.textContent = "✅ 复制成功！";
+                setTimeout(() => {
+                    copyTableBtn.innerHTML = '<i class="fa fa-copy mr-2"></i>复制表格内容';
+                }, 2000);
+            });
+        }
+
+        // 更新订购版本选择可用性
+        function updateOrderVersionSelect() {
+            const platform = document.getElementById('globalPlatform').value;
+            const versionSelect = document.getElementById('orderVersion');
+            
+            if (platform && PLATFORMS[platform] && PLATFORMS[platform].hasTrial) {
+                versionSelect.disabled = false;
+                versionSelect.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                versionSelect.value = 'official';
+                versionSelect.disabled = true;
+                versionSelect.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // 更新订购链接（自动填充对应版本链接）
+        function updateOrderLink() {
+            const platform = document.getElementById('globalPlatform').value;
+            const version = document.getElementById('orderVersion').value;
+            const linkInput = document.getElementById('orderLink');
+            
+            if (platform && PLATFORMS[platform] && PLATFORMS[platform].order) {
+                const url = version === 'trial' && PLATFORMS[platform].hasTrial 
+                    ? PLATFORMS[platform].order.trialUrl 
+                    : PLATFORMS[platform].order.officialUrl;
+                
+                linkInput.value = url;
+            } else {
+                linkInput.value = '';
+            }
+        }
+
+        // 处理京东授权链接（仅在试用版时处理）
+        function processJdAuthLink(link, isTrial) {
+            // 只有试用版才处理链接
+            if (!isTrial) return link;
+            
+            if (!link || !link.startsWith('https://open-oauth.jd.com/oauth2/to_login')) {
+                return link;
+            }
+            
+            // 替换app_key
+            let processedLink = link.replace(/app_key=[^&]+/, `app_key=${JD_APP_KEY}`);
+            if (!processedLink.includes(`app_key=${JD_APP_KEY}`)) {
+                processedLink = processedLink.includes('redirect_uri=') 
+                    ? processedLink.replace('redirect_uri=', `app_key=${JD_APP_KEY}&redirect_uri=`) 
+                    : `${processedLink}&app_key=${JD_APP_KEY}`;
+            }
+            
+            // 添加后缀
+            if (!processedLink.endsWith(JD_SUFFIX)) {
+                processedLink += JD_SUFFIX;
+            }
+            
+            return processedLink;
+        }
+
+        // 生成授权话术
+        function generateAuthScript() {
+            const platform = document.getElementById('globalPlatform').value;
+            const version = document.getElementById('orderVersion').value;
+            const shopName = document.getElementById('globalShopName').value.trim();
+            let link = document.getElementById('authLink').value.trim();
+            const resultElem = document.getElementById('authResult');
+            const messageElem = document.getElementById('authMessage');
+            
+            // 基础校验
+            if (!platform) return showMessage(messageElem, '请选择平台', 'error');
+            if (!shopName) return showMessage(messageElem, '请输入店铺名称', 'error');
+            if (!link) return showMessage(messageElem, '请输入授权链接', 'error');
+            
+            try {
+                // 判断是否为拼多多，添加额外内容
+                const isPdd = platform === 'pinduoduo';
+                const pddExtra = isPdd ? "，麻烦复制出来发群里" : "";
+                
+                // 京东链接处理（仅试用版）
+                let isJdTrial = false;
+                if (platform === 'jd') {
+                    isJdTrial = version === 'trial';
+                    link = processJdAuthLink(link, isJdTrial);
+                }
+				if (platform === 'tmall'||platform === 'taobao') {
+				    $("#tmsqts").show()
+                }else{
+					$("#tmsqts").hide()
+				}
+                // 生成话术（链接+换行+文字）
+                const platformName = PLATFORMS[platform].name;
+                const scriptText = SCRIPT_TEMPLATES.auth
+                    .replace('{{platformName}}', platformName)
+                    .replace('{{shopName}}', shopName)
+                    .replace('{{pddExtra}}', pddExtra);
+                const finalScript = `${link}\n${scriptText}`;
+                
+                resultElem.value = finalScript;
+                resultElem.select();
+                showMessage(messageElem, '授权话术生成成功', 'success');
+            } catch (error) {
+                showMessage(messageElem, '生成失败：' + error.message, 'error');
+                resultElem.value = '';
+            }
+        }
+
+        // 生成订购话术（区分正式/试用版）
+        function generateOrderScript() {
+            const platform = document.getElementById('globalPlatform').value;
+            const version = document.getElementById('orderVersion').value;
+            const shopName = document.getElementById('globalShopName').value.trim();
+            const link = document.getElementById('orderLink').value.trim();
+            const resultElem = document.getElementById('orderResult');
+            const messageElem = document.getElementById('orderMessage');
+            
+            // 基础校验
+            if (!platform) return showMessage(messageElem, '请选择平台', 'error');
+            if (!shopName) return showMessage(messageElem, '请输入店铺名称', 'error');
+            if (!link) return showMessage(messageElem, '请选择平台获取订购链接', 'error');
+            
+            try {
+                // 选择对应版本的话术模板
+                const template = SCRIPT_TEMPLATES.order[platform][version] || SCRIPT_TEMPLATES.order[platform].official;
+                // 生成话术（链接+换行+文字）
+                const scriptText = template.replace('{{shopName}}', shopName);
+                const finalScript = `${link}\n${scriptText}`;
+                
+                resultElem.value = finalScript;
+                resultElem.select();
+                showMessage(messageElem, '订购话术生成成功', 'success');
+            } catch (error) {
+                showMessage(messageElem, '生成失败：' + error.message, 'error');
+                resultElem.value = '';
+            }
+        }
+
+        // 复制结果
+        function copyResult(resultId, messageId) {
+            const resultElem = document.getElementById(resultId);
+            const messageElem = document.getElementById(messageId);
+            
+            if (resultElem.value) {
+                resultElem.select();
+                document.execCommand('copy');
+                showMessage(messageElem, '已复制到剪贴板', 'success');
+            } else {
+                showMessage(messageElem, '没有可复制的内容', 'error');
+            }
+        }
+
+        // 清空表单
+        function clearForm(formType) {
+            if (formType === 'auth') {
+                document.getElementById('authLink').value = '';
+                document.getElementById('authResult').value = '';
+                document.getElementById('authMessage').textContent = '';
+            } else if (formType === 'order') {
+                document.getElementById('orderLink').value = '';
+                document.getElementById('orderResult').value = '';
+                document.getElementById('orderMessage').textContent = '';
+            }
+        }
+
+        // 显示消息提示
+        function showMessage(element, text, type) {
+            element.textContent = text;
+            element.className = 'mt-2 text-sm';
+            element.classList.add(type === 'success' ? 'text-green-600' : 'text-red-600');
+            setTimeout(() => element.textContent = '', 3000);
+        }
+
+        // 保存/获取设置（记住上次选择）
+        function saveSetting(key, value) {
+            const settings = getSettings();
+            settings[key] = value;
+            localStorage.setItem('ecommerceToolSettings', JSON.stringify(settings));
+        }
+        
+        function getSettings() {
+            const saved = localStorage.getItem('ecommerceToolSettings');
+            return saved ? JSON.parse(saved) : {};
+        }
+        
+        function loadSettings() {
+            const settings = getSettings();
+            if (settings.lastGlobalPlatform) {
+                document.getElementById('globalPlatform').value = settings.lastGlobalPlatform;
+            }
+            if (settings.lastOrderVersion) {
+                document.getElementById('orderVersion').value = settings.lastOrderVersion;
+            }
+            if (settings.lastShopName) {
+                document.getElementById('globalShopName').value = settings.lastShopName;
+            }
+            if (settings.defaultApplicant) {
+                document.getElementById('defaultApplicant').value = settings.defaultApplicant;
+            }
+            if (settings.defaultPayer) {
+                document.getElementById('defaultPayer').value = settings.defaultPayer;
+            }
+            
+            // 触发相关更新
+            updateOrderVersionSelect();
+            updateOrderLink();
+        }
+
+        // 获取当前日期（YYYY-MM-DD格式）
+        function getTodayDate() {
+            const date = new Date();
+            return date.toISOString().split('T')[0];
+        }
+    </script>
+	</head>
+	<body class="bg-gray-50 min-h-screen py-6">
+		<div class="max-w-8xl mx-auto px-4">
+			<!-- 标题 -->
+			<div class="flex flex-col md:flex-row gap-6">
+				<!-- 左侧：平台和店铺输入区 -->
+				<div class="w-full md:w-1/5 bg-white rounded-xl shadow-md p-6">
+				    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+				        <i class="fa fa-cogs text-indigo-500 mr-2"></i>基本信息
+				    </h3>
+				
+				    <div class="space-y-4">
+				        <div>
+				            <label for="globalPlatform" class="block text-gray-700 font-medium mb-1">选择平台：</label>
+				            <select id="globalPlatform" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+				                <!-- JS动态填充 -->
+				            </select>
+				        </div>
+				
+				        <div>
+				            <label for="orderVersion" class="block text-gray-700 font-medium mb-1">版本类型：</label>
+				            <select id="orderVersion" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+				                <option value="official">正式版</option>
+				                <option value="trial">试用版</option>
+				            </select>
+				        </div>
+				
+				        <div>
+				            <label for="globalShopName" class="block text-gray-700 font-medium mb-1">店铺名称：</label>
+				            <input type="text" id="globalShopName" placeholder="例如：松湖印橡旗舰店" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+				            <p class="text-xs text-gray-500 mt-1">此信息将在所有功能中共享使用</p>
+				        </div>
+				
+				        <!-- 新增的两个按钮 -->
+				        <div class="flex flex-col gap-2 mt-6">
+				            <button id="getTokenBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+				                <i class="fa fa-key mr-1"></i>获取Token
+				            </button>
+				            <button id="showChangelogBtn" class="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors">
+				                <i class="fa fa-history mr-1"></i>查看更新日志
+				            </button>
+				        </div>
+				
+				        <div class="bg-blue-50 p-3 rounded-lg text-sm text-blue-700 mt-4">
+				            <p><i class="fa fa-info-circle mr-1"></i>特别说明：</p>
+				            <p class="mt-1">是谁创造了整个世界，是我们劳动群众！</p>
+							<p class="mt-1">一切归劳动者所有，哪能容得寄生虫！</p>
+				        </div>
+				    </div>
+				</div>
+				
+				<!-- 新增的更新日志弹窗 -->
+				<div id="changelogModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+				    <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col">
+				        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+				            <h3 class="text-lg font-semibold text-gray-800">更新日志</h3>
+				            <button id="closeChangelogBtn" class="text-gray-500 hover:text-gray-700">
+				                <i class="fa fa-times text-xl"></i>
+				            </button>
+				        </div>
+				        <div id="changelogContent" class="p-4 overflow-y-auto flex-grow">
+				            <!-- README.md内容将在这里显示 -->
+				            <div class="flex items-center justify-center h-40 text-gray-500">
+				                <i class="fa fa-spinner fa-spin mr-2"></i>加载更新日志中...
+				            </div>
+				        </div>
+				        <div class="p-4 border-t border-gray-200 flex justify-end">
+				            <button id="closeChangelogBtn2" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+				                关闭
+				            </button>
+				        </div>
+				    </div>
+				</div>
+
+
+				<!-- 右侧：主要功能区 -->
+				<div class="w-full md:w-3/4">
+					<!-- 主标签切换 -->
+					<div class="flex mb-6 rounded-lg overflow-hidden shadow-sm">
+						<button class="main-tab bg-indigo-600 text-white px-4 py-3 flex-1 font-medium" data-target="orderTab">
+							<i class="fa fa-shopping-cart mr-2"></i>订购话术
+						</button>
+						<button class="main-tab bg-gray-200 text-gray-700 px-4 py-3 flex-1 font-medium" data-target="authTab">
+							<i class="fa fa-key mr-2"></i>授权话术
+						</button>
+						<button class="main-tab bg-gray-200 text-gray-700 px-4 py-3 flex-1 font-medium" data-target="tableTab">
+							<i class="fa fa-table mr-2"></i>生成垫付表格
+						</button>
+						<button class="main-tab bg-gray-200 text-gray-700 px-4 py-3 flex-1 font-medium" data-target="wdnmd">
+							<i class="fa fa-table mr-2"></i>生成CRM表格
+						</button>
+					</div>
+
+					<!-- 授权话术模块 -->
+					<div id="authTab" class="main-content hidden bg-white rounded-xl shadow-md p-6 mb-6">
+						<h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+							<i class="fa fa-lock text-indigo-500 mr-2"></i>授权话术生成&nbsp;&nbsp;<span id="tmsqts" style="color: red;font-size: 10px;" hidden >*天猫授权需先维护商品</span>
+						</h2>
+
+						<div class="space-y-4">
+							<div>
+								<label for="authLink" class="block text-gray-700 font-medium mb-1">
+									授权链接（京东试用版自动处理）：
+								</label>
+								<textarea id="authLink" rows="3" placeholder="粘贴授权链接，例如：https://open-oauth.jd.com/..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+								<p class="text-xs text-gray-500 mt-1">
+									仅京东试用版会自动处理链接，其他平台链接保持原样
+								</p>
+							</div>
+
+							<div class="flex flex-wrap gap-3">
+								<button id="generateAuthBtn" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+									<i class="fa fa-magic mr-1"></i>生成话术
+								</button>
+								<button id="clearAuthBtn" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+									<i class="fa fa-eraser mr-1"></i>清空
+								</button>
+							</div>
+
+							<div>
+								<label for="authResult" class="block text-gray-700 font-medium mb-1">生成结果（链接与文字已换行）：</label>
+								<textarea id="authResult" rows="5" readonly class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none"></textarea>
+							</div>
+
+							<button id="copyAuthBtn" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+								<i class="fa fa-copy mr-1"></i>复制话术（含换行格式）
+							</button>
+
+							<div id="authMessage" class="mt-2"></div>
+						</div>
+					</div>
+
+					<!-- 订购话术模块 -->
+					<div id="orderTab" class="main-content bg-white rounded-xl shadow-md p-6 mb-6">
+						<h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+							<i class="fa fa-credit-card text-green-500 mr-2"></i>订购话术生成
+						</h2>
+
+						<div class="space-y-4">
+							<div>
+								<label for="orderLink" class="block text-gray-700 font-medium mb-1">订购链接（自动填充）：</label>
+								<input type="text" id="orderLink" readonly class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none">
+							</div>
+
+							<div class="flex flex-wrap gap-3">
+								<button id="generateOrderBtn" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
+									<i class="fa fa-magic mr-1"></i>生成话术
+								</button>
+								<button id="clearOrderBtn" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+									<i class="fa fa-eraser mr-1"></i>清空
+								</button>
+								<button id="generateTableFromOrderBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+									<i class="fa fa-table mr-1"></i>生成垫付表格数据
+								</button>
+							</div>
+
+							<div>
+								<label for="orderResult" class="block text-gray-700 font-medium mb-1">生成结果（链接与文字已换行）：</label>
+								<textarea id="orderResult" rows="5" readonly class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none"></textarea>
+							</div>
+
+							<button id="copyOrderBtn" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+								<i class="fa fa-copy mr-1"></i>复制话术（含换行格式）
+							</button>
+
+							<div id="orderMessage" class="mt-2"></div>
+						</div>
+					</div>
+					<!-- 生成CRM表格模块 -->
+					<div id="wdnmd" class="main-content hidden bg-white rounded-xl shadow-md p-6 mb-6">
+						<iframe id="SCCRMBG" src="生成CRM表格.html" width="100%" height="600" frameborder="0" scrolling="auto" title="目标网页标题"></iframe>
+					</div>
+					<!-- 生成表格模块 -->
+					<div id="tableTab" class="main-content hidden bg-white rounded-xl shadow-md p-6 mb-6">
+						<form id="orderForm" class="space-y-4 mb-6">
+							<div class="grid md:grid-cols-2 gap-4">
+								<div>
+									<label for="ownership" class="block text-gray-700 font-medium mb-1">归属：</label>
+									<input type="text" id="ownership" placeholder="例如：华东区/张三" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+								</div>
+								<div>
+									<label for="customerName" class="block text-gray-700 font-medium mb-1">客户名称（可选）：</label>
+									<input type="text" id="customerName" placeholder="例如：XX贸易公司" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+								</div>
+							</div>
+
+							<div class="bg-gray-50 p-4 rounded-lg">
+								<div class="grid md:grid-cols-2 gap-4">
+									<div>
+										<label for="defaultApplicant" class="block text-gray-700 font-medium mb-1">申请人：</label>
+										<input type="text" id="defaultApplicant" placeholder="例如：张三" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+									</div>
+									<div>
+										<label for="defaultPayer" class="block text-gray-700 font-medium mb-1">付款人：</label>
+										<input type="text" id="defaultPayer" placeholder="例如：郑景骏" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+									</div>
+								</div>
+								<div class="mt-3 flex">
+									<button type="button" id="saveDefaultsBtn" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm">
+										<i class="fa fa-save mr-1"></i>保存默认值
+									</button>
+									<div id="settingsMessage" class="ml-3"></div>
+								</div>
+							</div>
+
+							<button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+								<i class="fa fa-plus-circle mr-1"></i>添加到表格
+							</button>
+						</form>
+
+						<div id="tableMessage" class="mb-4"></div>
+
+						<div class="table-container">
+							<table class="min-w-full bg-white">
+								<thead>
+									<tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+										<th class="border border-gray-200 px-4 py-3 text-left">付款日期</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">付款人</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">申请日期</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">客户名称</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">资金用处</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">平台类型</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">店铺名称</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">归属</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">出帐金额</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">版本</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">申请人</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">备注</th>
+										<th class="border border-gray-200 px-4 py-3 text-left">是否结算</th>
+									</tr>
+								</thead>
+								<tbody id="orderTableBody">
+									<!-- JS动态添加行 -->
+								</tbody>
+							</table>
+						</div>
+						
+						<div class="mt-4">
+							<button id="copyTableBtn" disabled class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors opacity-50 cursor-not-allowed">
+								<i class="fa fa-copy mr-2"></i>复制表格内容
+							</button>
+							<p class="text-xs text-gray-500 mt-2 text-center">
+								复制后可直接粘贴到Excel/Google Sheets中
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>业务信息登记表</title>
+    <!-- 引入 jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- 引入 Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        /* 基础样式 */
+        :root {
+            --primary-color: #2563eb;
+            --primary-light: #eff6ff;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --text-color: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+        
+        .header-desc {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        /* 表单样式 */
+        .form-section {
+            margin-bottom: 24px;
+        }
+        
+        .form-section-title {
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: var(--text-color);
+            font-size: 16px;
+            padding-left: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        /* 精简接口区域的网格布局 */
+        .api-form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .manual-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+        
+        .form-label.required::after {
+            content: "*";
+            color: var(--danger-color);
+            margin-left: 4px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control[readonly] {
+            background-color: var(--primary-light);
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+            display: none; /* 精简显示，隐藏提示文字 */
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+        
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .data-table th {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--primary-light);
+            transition: background-color 0.2s ease;
+        }
+        
+        /* 状态标签样式 */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+        
+        .status-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+        
+        .status-inactive {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+        
+        /* 表单操作区 */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* 提示信息 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .toast.error {
+            background-color: var(--danger-color);
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-large {
+            max-width: 900px;
+        }
+        
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1024px) {
+            .api-form-grid {
+                grid-template-columns: 2fr 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .api-form-grid, .manual-form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions, .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        /* 响应式表格样式 */
+        .response-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        .response-table th,
+        .response-table td {
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        
+        .response-table th {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .response-table tr.selected {
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+        
+        .select-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .json-pre {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 15px;
+        }
+        
+        .select-all-container {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 独立表单区域 -->
+        <div class="card">
+            <div class="card-title">
+                <span>填写信息</span>
+                <button class="btn btn-secondary" id="editDefaults">
+                    <i class="fas fa-cog mr-1"></i>修改默认信息
+                </button>
+            </div>
+            <!-- 手动填写区域 -->
+                <div class="form-section">
+                    <div class="form-section-title">需手动填写信息 </div>
+                    <div class="manual-form-grid">
+                        <div class="form-group">
+                            <label class="form-label required">群名</label>
+                            <input type="text" class="form-control" id="groupName" placeholder="请输入群名">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label ">国补（一品多地）公司</label>
+                            <input type="text" class="form-control" id="subsidyCompany" placeholder="请输入国补公司">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label ">寄售公司名称</label>
+                            <input type="text" class="form-control" id="consignmentCompany" placeholder="请输入寄售公司">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-danger" id="resetForm">重置(包括下方表格)</button>
+                    <button class="btn btn-success" id="addRow">确认添加</button>
+					<button class="btn btn-primary" id="copyTableBtn">复制所有行</button>
+                </div>
+            </div>
+            <!-- 接口获取区域 - 精简布局 -->
+            <div class="form-section">
+                <div class="form-section-title">接口获取信息</div>
+                <div class="api-form-grid">
+                    <div class="form-group">
+                        <label class="form-label required">店铺名称</label>
+                        <input type="text" class="form-control" id="shopName" placeholder="请输入店铺名称或企业名称">
+                    </div>
+                    
+                    <div class="form-group" style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-primary" id="fetchData" style="width: 100%;">
+                            <i class="fas fa-download mr-1"></i>获取信息
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">店铺ID</label>
+                        <input type="text" class="form-control" id="shopId"  placeholder="自动获取">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">电商平台</label>
+                        <input type="text" class="form-control" id="platform"  placeholder="自动获取">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">开票公司</label>
+                        <input type="text" class="form-control" id="invoiceCompany"  placeholder="自动获取">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">开票税号</label>
+                        <input type="text" class="form-control" id="taxId"  placeholder="自动获取">
+                    </div>
+                </div>
+            </div>
+        <div class="card">
+            <div class="card-title">信息列表</div>
+            <div class="table-container">
+                <table class="data-table" id="businessTable">
+                    <thead>
+                        <tr>
+							 <th>操作</th>
+                            <th>使用状态</th>
+                            <th>店铺名称</th>
+                            <th>店铺ID</th>
+                            <th>电商平台</th>
+                            <th>开票公司</th>
+                            <th>开票税号</th>
+                            <th>群名</th>
+                            <th>联系工具</th>
+                            <th>客户归属</th>
+                            <th>渠道名称</th>
+                            <th>产品运营</th>
+                            <th>使用产品</th>
+                            <th>国补公司</th>
+                            <th>寄售公司</th>
+                           
+                        </tr>
+                    </thead>
+					 <tbody id="CRMtable">
+					 </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 默认信息弹窗 -->
+    <div class="modal-overlay" id="defaultsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">修改默认信息</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="manual-form-grid">
+                    <div class="form-group">
+                        <label class="form-label required">Token</label>
+                        <input type="text" class="form-control" id="modalToken" placeholder="请输入接口Token">
+                        <div class="form-hint" style="display:block;">Token失效时需在此更新</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">使用状态</label>
+                        <select class="form-control" id="modalStatus">
+                            <option value="active">上线交付中</option>
+                            <option value="pending">正常运维</option>
+                            <option value="inactive">项目终止</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">联系工具</label>
+                        <input type="text" class="form-control" id="modalContactTool">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">产品运营</label>
+                        <input type="text" class="form-control" id="modalProductManager">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">使用产品</label>
+                        <input type="text" class="form-control" id="modalProductUsed">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">客户归属</label>
+                        <input type="text" class="form-control" id="modalCustomerOwner">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">渠道名称</label>
+                        <input type="text" class="form-control" id="modalChannelName">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelModal">取消</button>
+                <button class="btn btn-primary" id="saveDefaults">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 接口响应弹窗 - 支持数据选择 -->
+    <div class="modal-overlay" id="responseModal">
+        <div class="modal modal-large">
+            <div class="modal-header">
+                <h3 class="modal-title">选择店铺信息</h3>
+                <button class="modal-close" id="closeResponseModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="responseStatus"></div>
+                
+                <div class="select-all-container">
+                    <input type="checkbox" id="selectAll" class="select-checkbox">
+                    <label for="selectAll">全选</label>
+                </div>
+                
+                <h4 style="margin-top:15px;">查询结果 (请选择要添加的数据):</h4>
+                <div class="table-container">
+                    <table class="response-table" id="responseTable">
+                        <thead>
+                            <tr>
+                                <th>选择</th>
+                                <th>序号</th>
+                                <th>店铺名称</th>
+                                <th>店铺ID</th>
+                                <th>电商平台</th>
+                                <th>开票公司</th>
+                                <th>开票税号</th>
+                            </tr>
+                        </thead>
+                        <tbody id="responseTableBody">
+                            <!-- 响应数据将在这里显示 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <h4 style="margin-top:15px;">原始JSON数据:</h4>
+                <pre class="json-pre" id="responseJson"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelResponseBtn">取消</button>
+                <button class="btn btn-primary" id="confirmSelectionBtn">确认选择</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 提示框 -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage"></span>
+    </div>
+
+    <script>
+		var youtoken="";
+		$(function(){
+			 youtoken=localStorage.getItem('youtoken');
+			 console.log(youtoken);
+		})
+        document.addEventListener('DOMContentLoaded', function() {
+            // 默认值设置
+            const defaultValues = {
+                status: 'active',
+                contactTool: '企微',
+                productManager: '段榕堂',
+                productUsed: '电商',
+                customerOwner: '直销',
+                channelName: '税航',
+                token: localStorage.getItem('youtoken'), // 默认token
+                pageSize: 30 // 默认分页大小
+            };
+            
+            // 存储当前查询到的所有数据
+            let currentResponseData = null;
+            
+            const tableBody = document.querySelector('#businessTable tbody');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const defaultsModal = document.getElementById('defaultsModal');
+            const responseModal = document.getElementById('responseModal');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const responseTableBody = document.getElementById('responseTableBody');
+            
+            // 初始化模态框默认值
+            document.getElementById('modalToken').value = defaultValues.token;
+            document.getElementById('modalStatus').value = defaultValues.status;
+            document.getElementById('modalContactTool').value = defaultValues.contactTool;
+            document.getElementById('modalProductManager').value = defaultValues.productManager;
+            document.getElementById('modalProductUsed').value = defaultValues.productUsed;
+            document.getElementById('modalCustomerOwner').value = defaultValues.customerOwner;
+            document.getElementById('modalChannelName').value = defaultValues.channelName;
+            
+            // 显示提示信息
+            function showToast(message, isError = false) {
+                toastMessage.textContent = message;
+                toast.classList.add('show');
+                if (isError) {
+                    toast.classList.add('error');
+                    toast.innerHTML = `<i class="fas fa-exclamation-circle"></i><span id="toastMessage">${message}</span>`;
+                } else {
+                    toast.classList.remove('error');
+                    toast.innerHTML = `<i class="fas fa-check-circle"></i><span id="toastMessage">${message}</span>`;
+                }
+                
+                setTimeout(() => {
+                    toast.classList.remove('show', 'error');
+                }, 3000);
+            }
+            
+            // 打开默认信息弹窗
+            document.getElementById('editDefaults').addEventListener('click', function() {
+                defaultsModal.classList.add('show');
+            });
+            
+            // 关闭默认信息弹窗
+            document.getElementById('closeModal').addEventListener('click', function() {
+                defaultsModal.classList.remove('show');
+            });
+            
+            document.getElementById('cancelModal').addEventListener('click', function() {
+                defaultsModal.classList.remove('show');
+            });
+            
+            // 保存默认信息
+            document.getElementById('saveDefaults').addEventListener('click', function() {
+                // 获取并验证token
+                const token = document.getElementById('modalToken').value.trim();
+                if (!token) {
+                    showToast('Token不能为空', true);
+                    return;
+                }
+                
+                // 更新所有默认值
+                defaultValues.token = token;
+                defaultValues.status = document.getElementById('modalStatus').value;
+                defaultValues.contactTool = document.getElementById('modalContactTool').value;
+                defaultValues.productManager = document.getElementById('modalProductManager').value;
+                defaultValues.productUsed = document.getElementById('modalProductUsed').value;
+                defaultValues.customerOwner = document.getElementById('modalCustomerOwner').value;
+                defaultValues.channelName = document.getElementById('modalChannelName').value;
+                
+                defaultsModal.classList.remove('show');
+                showToast('默认信息已更新');
+            });
+            
+            // 关闭响应弹窗
+            document.getElementById('closeResponseModal').addEventListener('click', function() {
+                responseModal.classList.remove('show');
+            });
+            
+            document.getElementById('cancelResponseBtn').addEventListener('click', function() {
+                responseModal.classList.remove('show');
+            });
+            
+            // 全选/取消全选功能
+            selectAllCheckbox.addEventListener('change', function() {
+                const checkboxes = responseTableBody.querySelectorAll('.row-select-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                    // 更新行选中状态
+                    const row = checkbox.closest('tr');
+                    if (this.checked) {
+                        row.classList.add('selected');
+                    } else {
+                        row.classList.remove('selected');
+                    }
+                });
+            });
+            
+            // 单行选择功能
+            responseTableBody.addEventListener('change', function(e) {
+                if (e.target.classList.contains('row-select-checkbox')) {
+                    const row = e.target.closest('tr');
+                    if (e.target.checked) {
+                        row.classList.add('selected');
+                    } else {
+                        row.classList.remove('selected');
+                        // 如果取消选中，全选框也应取消
+                        selectAllCheckbox.checked = false;
+                    }
+                    
+                    // 检查是否所有行都被选中
+                    const checkboxes = responseTableBody.querySelectorAll('.row-select-checkbox');
+                    const checkedBoxes = responseTableBody.querySelectorAll('.row-select-checkbox:checked');
+                    selectAllCheckbox.checked = checkboxes.length === checkedBoxes.length && checkboxes.length > 0;
+                }
+            });
+            
+            // 行点击选择功能
+            responseTableBody.addEventListener('click', function(e) {
+                // 忽略复选框本身的点击，避免冲突
+                if (e.target.type !== 'checkbox' && e.target.tagName !== 'LABEL') {
+                    const row = e.target.closest('tr');
+                    if (row) {
+                        const checkbox = row.querySelector('.row-select-checkbox');
+                        if (checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                            // 触发change事件以更新状态
+                            const event = new Event('change');
+                            checkbox.dispatchEvent(event);
+                        }
+                    }
+                }
+            });
+            
+            // 确认选择并添加数据
+            document.getElementById('confirmSelectionBtn').addEventListener('click', function() {
+                if (!currentResponseData || !currentResponseData.rows || currentResponseData.rows.length === 0) {
+                    showToast('没有可选择的数据', true);
+                    return;
+                }
+                
+                // 获取选中的行
+                const checkedBoxes = responseTableBody.querySelectorAll('.row-select-checkbox:checked');
+                if (checkedBoxes.length === 0) {
+                    showToast('请至少选择一条数据', true);
+                    return;
+                }
+                
+                // 获取选中的数据索引
+                const selectedIndices = Array.from(checkedBoxes).map(checkbox => {
+                    return parseInt(checkbox.getAttribute('data-index'));
+                });
+                
+                // 获取选中的数据
+                const selectedData = selectedIndices.map(index => currentResponseData.rows[index]);
+                
+                // 如果只选择了一条数据，填充到表单
+                if (selectedData.length === 1) {
+                    const firstItem = selectedData[0];
+                    document.getElementById('shopId').value = firstItem.DPID || '';
+                    document.getElementById('platform').value = firstItem.DPLX || '';
+                    document.getElementById('invoiceCompany').value = firstItem.QYMC || '';
+                    document.getElementById('taxId').value = firstItem.QYSH || '';
+                }
+                
+                // 关闭弹窗
+                responseModal.classList.remove('show');
+                
+                // 批量添加到表格
+                addMultipleRows(selectedData);
+                
+                showToast(`已成功添加 ${selectedData.length} 条数据`);
+            });
+            
+            // 显示接口响应信息
+            function showResponseInfo(response, isError = false) {
+                const statusEl = document.getElementById('responseStatus');
+                const jsonEl = document.getElementById('responseJson');
+                
+                // 清空之前的内容
+                responseTableBody.innerHTML = '';
+                currentResponseData = null;
+                selectAllCheckbox.checked = false;
+                
+                if (isError) {
+                    statusEl.innerHTML = `<div style="color: var(--danger-color);"><i class="fas fa-exclamation-circle"></i> 接口请求失败: ${response}</div>`;
+                    jsonEl.textContent = '';
+                    document.getElementById('confirmSelectionBtn').disabled = true;
+                } else {
+                    statusEl.innerHTML = `<div style="color: var(--success-color);"><i class="fas fa-check-circle"></i> 接口请求成功，返回 ${response.rows ? response.rows.length : 0} 条数据</div>`;
+                    
+                    // 存储当前响应数据
+                    currentResponseData = response;
+                    
+                    // 显示JSON数据
+                    jsonEl.textContent = JSON.stringify(response, null, 2);
+                    
+                    // 填充表格
+                    if (response.rows && Array.isArray(response.rows) && response.rows.length > 0) {
+                        response.rows.forEach((item, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>
+                                    <input type="checkbox" class="select-checkbox row-select-checkbox" 
+                                           id="select-${index}" data-index="${index}">
+                                </td>
+                                <td>${index + 1}</td>
+                                <td>${item.DPMC || ''}</td>
+                                <td>${item.DPID || ''}</td>
+                                <td>${item.DPLX || ''}</td>
+                                <td>${item.QYMC || ''}</td>
+                                <td>${item.QYSH || ''}</td>
+                            `;
+                            responseTableBody.appendChild(row);
+                        });
+                        
+                        document.getElementById('confirmSelectionBtn').disabled = false;
+                        
+                        // 如果只有一条数据，自动选中并填充
+                        if (response.rows.length === 1) {
+                            setTimeout(() => {
+                                const checkbox = responseTableBody.querySelector('.row-select-checkbox');
+                                if (checkbox) {
+                                    checkbox.checked = true;
+                                    const event = new Event('change');
+                                    checkbox.dispatchEvent(event);
+                                    
+                                    // 自动确认选择
+                                    document.getElementById('confirmSelectionBtn').click();
+                                }
+                            }, 500);
+                        }
+                    } else {
+                        const row = document.createElement('tr');
+                        row.innerHTML = '<td colspan="7" style="text-align:center;">没有返回数据</td>';
+                        responseTableBody.appendChild(row);
+                        document.getElementById('confirmSelectionBtn').disabled = true;
+                    }
+                }
+                
+                // 显示弹窗（如果不是单条数据自动处理的情况）
+                if (!(response.rows && response.rows.length === 1)) {
+                    responseModal.classList.add('show');
+                }
+            }
+            
+            // 批量添加行到表格
+            function addMultipleRows(items) {
+                if (!items || !Array.isArray(items) || items.length === 0) return;
+                
+                // 获取手动填写的表单数据
+                const groupName = document.getElementById('groupName').value.trim();
+                const subsidyCompany = document.getElementById('subsidyCompany').value.trim();
+                const consignmentCompany = document.getElementById('consignmentCompany').value.trim();
+                
+                // 状态标签类
+                let statusClass = '';
+                let statusText = '';
+                switch(defaultValues.status) {
+                    case 'active':
+                        statusClass = 'status-active';
+                        statusText = '上线交付中';
+                        break;
+                    case 'pending':
+                        statusClass = 'status-pending';
+                        statusText = '待审核';
+                        break;
+                    case 'inactive':
+                        statusClass = 'status-inactive';
+                        statusText = '已下线';
+                        break;
+                }
+                
+                // 为每个项目创建行
+                items.forEach((item, index) => {
+                    const newRow = document.createElement('tr');
+                    
+                    newRow.innerHTML = `
+					<td>
+					    <button class="btn btn-secondary btn-sm copyRow"><i class="fas fa-copy"></i> 复制</button>
+					    <button class="btn btn-danger btn-sm deleteRow"><i class="fas fa-trash"></i> 删除</button>
+					</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${item.DPMC || ''}</td>
+                        <td>${item.DPID || ''}</td>
+                        <td>${item.DPLX || ''}</td>
+                        <td>${item.QYMC || ''}</td>
+                        <td>${item.QYSH || ''}</td>
+                        <td>${groupName || ''}</td>
+                        <td>${defaultValues.contactTool}</td>
+                        <td>${defaultValues.customerOwner}</td>
+                        <td>${defaultValues.channelName}</td>
+                        <td>${defaultValues.productManager}</td>
+                        <td>${defaultValues.productUsed}</td>
+                        <td>${subsidyCompany || ''}</td>
+                        <td>${consignmentCompany || ''}</td>
+                        
+                    `;
+                    
+                    // 添加动画效果
+                    newRow.style.opacity = '0';
+                    newRow.style.transform = 'translateY(20px)';
+                    newRow.style.transition = `all 0.3s ease ${index * 100}ms`;
+                    
+                    tableBody.appendChild(newRow);
+                    
+                    // 触发重绘后应用动画
+                    setTimeout(() => {
+                        newRow.style.opacity = '1';
+                        newRow.style.transform = 'translateY(0)';
+                    }, 10);
+                    
+                    // 绑定事件
+                    bindRowEvents(newRow);
+                });
+            }
+            
+            // 获取店铺信息按钮 - 使用提供的jQuery AJAX代码
+            document.getElementById('fetchData').addEventListener('click', function() {
+                const shopName = document.getElementById('shopName').value.trim();
+                
+                if (!shopName) {
+                    showToast('请先输入店铺名称', true);
+                    return;
+                }
+                
+                if (!defaultValues.token) {
+                    showToast('请先在默认信息中设置Token', true);
+                    return;
+                }
+                
+                // 显示加载状态
+                this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>获取中...';
+                this.disabled = true;
+                
+                // 构建查询URL
+                const url = `https://mycst.cn//NEWKP/DSKP/DPTBJL?pageindex=1&pagesize=${defaultValues.pageSize}&gzj=${encodeURIComponent(shopName)}&token=${encodeURIComponent(defaultValues.token)}`;
+                
+                // 使用提供的jQuery AJAX代码
+                var settings = {
+                    "url": url,
+                    "method": "POST",
+                    "timeout": 10000, // 10秒超时
+                };
+                
+                $.ajax(settings)
+                .done(function (response) {
+                    // 显示原始响应信息
+                    showResponseInfo(response);
+                })
+                .fail(function (xhr, status, error) {
+                    // 显示错误信息
+                    let errorMsg = '';
+                    if (status === 'timeout') {
+                        errorMsg = '请求超时，请稍后重试';
+                    } else if (xhr.status === 401) {
+                        errorMsg = 'Token无效或已过期，请更新Token';
+                    } else {
+                        errorMsg = `错误: ${error || '未知错误'}`;
+                    }
+                    
+                    showResponseInfo(errorMsg, true);
+                    showToast(errorMsg, true);
+                    
+                    // 清空之前的数据
+                    document.getElementById('shopId').value = '';
+                    document.getElementById('platform').value = '';
+                    document.getElementById('invoiceCompany').value = '';
+                    document.getElementById('taxId').value = '';
+                })
+                .always(function () {
+                    // 恢复按钮状态
+                    document.getElementById('fetchData').innerHTML = '<i class="fas fa-download mr-1"></i>获取信息';
+                    document.getElementById('fetchData').disabled = false;
+                });
+            });
+            
+            // 从表单添加新行
+            document.getElementById('addRow').addEventListener('click', function() {
+                // 获取表单数据
+                const shopName = document.getElementById('shopName').value.trim();
+                const shopId = document.getElementById('shopId').value.trim();
+                const groupName = document.getElementById('groupName').value.trim();
+                const subsidyCompany = document.getElementById('subsidyCompany').value.trim();
+                const consignmentCompany = document.getElementById('consignmentCompany').value.trim();
+                
+                // 验证必填项
+                if (!shopName || !shopId) {
+                    showToast('请输入店铺名称并获取店铺信息', true);
+                    return;
+                }
+                
+                if (!groupName || !subsidyCompany || !consignmentCompany) {
+                    showToast('请填写所有必填的手动输入项', true);
+                    return;
+                }
+                
+                // 创建新行
+                const newRow = document.createElement('tr');
+                
+                // 状态标签类
+                let statusClass = '';
+                let statusText = '';
+                switch(defaultValues.status) {
+                    case 'active':
+                        statusClass = 'status-active';
+                        statusText = '上线交付中';
+                        break;
+                    case 'pending':
+                        statusClass = 'status-pending';
+                        statusText = '待审核';
+                        break;
+                    case 'inactive':
+                        statusClass = 'status-inactive';
+                        statusText = '已下线';
+                        break;
+                }
+                
+                newRow.innerHTML = `
+				<td>
+				    <button class="btn btn-secondary btn-sm copyRow"><i class="fas fa-copy"></i> 复制</button>
+				    <button class="btn btn-danger btn-sm deleteRow"><i class="fas fa-trash"></i> 删除</button>
+				</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>${shopName}</td>
+                    <td>${shopId}</td>
+                    <td>${document.getElementById('platform').value || ''}</td>
+                    <td>${document.getElementById('invoiceCompany').value || ''}</td>
+                    <td>${document.getElementById('taxId').value || ''}</td>
+                    <td>${groupName}</td>
+                    <td>${defaultValues.contactTool}</td>
+                    <td>${defaultValues.customerOwner}</td>
+                    <td>${defaultValues.channelName}</td>
+                    <td>${defaultValues.productManager}</td>
+                    <td>${defaultValues.productUsed}</td>
+                    <td>${subsidyCompany}</td>
+                    <td>${consignmentCompany}</td>
+                   
+                `;
+                
+                // 添加动画效果
+                newRow.style.opacity = '0';
+                newRow.style.transform = 'translateY(20px)';
+                newRow.style.transition = 'all 0.3s ease';
+                
+                tableBody.appendChild(newRow);
+                
+                // 触发重绘后应用动画
+                setTimeout(() => {
+                    newRow.style.opacity = '1';
+                    newRow.style.transform = 'translateY(0)';
+                }, 10);
+                
+                showToast('数据已添加到表格');
+                
+                // 绑定事件
+                bindRowEvents(newRow);
+            });
+            
+            // 重置表单
+            document.getElementById('resetForm').addEventListener('click', function() {
+                // 清空所有输入框
+                document.getElementById('shopName').value = '';
+                document.getElementById('shopId').value = '';
+                document.getElementById('platform').value = '';
+                document.getElementById('invoiceCompany').value = '';
+                document.getElementById('taxId').value = '';
+                document.getElementById('groupName').value = '';
+                document.getElementById('subsidyCompany').value = '';
+                document.getElementById('consignmentCompany').value = '';
+				//清除crm表格
+				 $("#CRMtable").empty()
+                showToast('表单已重置');
+            });
+            
+            // 绑定行事件
+            function bindRowEvents(row) {
+                // 复制行
+                row.querySelector('.copyRow').addEventListener('click', function() {
+                    // 获取当前行的所有单元格数据（排除最后一个操作列）
+                    const cells = row.querySelectorAll('td:not(:first-child)');
+                    let textToCopy = '';
+                    
+                    cells.forEach((cell, index) => {
+                        // 对于状态标签，获取其文本内容
+                        if (cell.querySelector('.status-badge')) {
+                            textToCopy += cell.querySelector('.status-badge').textContent;
+                        } else {
+                            textToCopy += cell.textContent;
+                        }
+                        
+                        // 用制表符分隔，最后一个单元格不加
+                        if (index < cells.length - 1) {
+                            textToCopy += '\t';
+                        }
+                    });
+                    
+                    // 复制到剪贴板
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showToast('行数据已复制，可直接粘贴到Excel');
+                    }).catch(err => {
+                        console.error('复制失败: ', err);
+                        showToast('复制失败，请手动复制', true);
+                    });
+                });
+                
+                // 删除行
+                row.querySelector('.deleteRow').addEventListener('click', function() {
+                    if (confirm('确定要删除这一行吗？')) {
+                        row.style.opacity = '0';
+                        row.style.transform = 'translateX(-20px)';
+                        row.style.transition = 'all 0.3s ease';
+                        
+                        setTimeout(() => {
+                            row.remove();
+                            showToast('行已删除');
+                        }, 300);
+                    }
+                });
+				
+				
+				$('#copyTableBtn').click(function() {
+				    const rows = $('#CRMtable tr');
+				    if (rows.length == 0) {
+				        alert('没有可复制的内容');
+				        return;
+				    }
+				    
+				    let copyText = '';
+				    
+				    // 遍历每一行（已排除第一行）
+				    rows.each(function() {
+				        const cells = $(this).find('td');
+				        const cellValues = [];
+				        
+				        // 遍历当前行的所有单元格
+				        cells.slice(1).each(function() {
+				            // 获取单元格文本并去除首尾空格
+				            cellValues.push($(this).text().trim());
+				        });
+				        // 用制表符分隔单元格内容，行之间用换行分隔
+				        copyText += cellValues.join('\t') + '\n';
+				    });
+				    
+				    // 创建临时文本区域用于复制
+				    const tempTextarea = $('<textarea>').val(copyText).appendTo('body');
+				    tempTextarea.select();
+				    document.execCommand('copy');
+				    tempTextarea.remove();
+				});
+            }
+            
+            // 初始绑定事件
+            // document.querySelectorAll('#businessTable tbody tr').forEach(row => {
+            //     bindRowEvents(row);
+            // });
+            
+            // 点击模态框外部关闭
+            defaultsModal.addEventListener('click', function(e) {
+                if (e.target === defaultsModal) {
+                    defaultsModal.classList.remove('show');
+                }
+            });
+            
+            responseModal.addEventListener('click', function(e) {
+                if (e.target === responseModal) {
+                    responseModal.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
