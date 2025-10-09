@@ -253,7 +253,7 @@
                     officialUrl: "https://fuwu.jinritemai.com/detail?from=open_partner_svcList&service_id=35430",
                     trialUrl: "https://fuwu.jinritemai.com/detail?from=open_partner_svcList&service_id=35430"
                 },
-                hasTrial: false
+                hasTrial: true
             }
         };
 
@@ -265,7 +265,7 @@
             // 订购话术（区分正式版/试用版）
             order: {
                 jd: {
-                    official: "请使用京东的【{{shopName}}】店铺主账号订购【初级版一年】。支付二维码发出来，由我们这边扫码支付费用144元",
+                    official: "请使用京东的【{{shopName}}】店铺主账号订购【多店铺电票版】。支付二维码发出来，由我们这边扫码支付费用144元",
                     trial: "请使用京东【{{shopName}}】京东店铺主账号购买【免费试用十五天】。"
                 },
                 tmall: {
@@ -940,7 +940,7 @@
 									<input type="text" id="ownership" placeholder="例如：华东区/张三" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
 								</div>
 								<div>
-									<label for="customerName" class="block text-gray-700 font-medium mb-1">客户名称（可选）：</label>
+									<label for="customerName" class="block text-gray-700 font-medium mb-1" style="color: red;">客户名称：</label>
 									<input type="text" id="customerName" placeholder="例如：XX贸易公司" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
 								</div>
 							</div>

@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		"起来饥寒交迫的奴隶，起来全世界受苦的人 —— 国际歌",
 		"不要看他说了什么，要看他做了什么",
 		"三分钟热度，也有三分钟收获",
+		"不会从失败中寻求教训的人通向成功的道路是遥远的 —— 拿破仑",
+		"除了初秋的一场泪雨，能省的，都要省下来 —— 许立志",
+		"科学的造物，居然要在信仰中寻求答案 —— 莫伊拉",
     ];
 
     // 找到"特别说明"元素（假设其id为"specialNote"，如果实际id不同请修改）
@@ -67,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // 获取店铺信息的主函数
 async function getDPXX() {
     // 初始化变量（优先从URL参数获取，无参数则用默认值）
-    const urlParams = getUrlParams();
     const dpmc = localStorage.getItem("dpmc");//店铺名称
     const dppt = localStorage.getItem("pt"); // 店铺类型
     let token = localStorage.getItem("youtoken");
