@@ -17,6 +17,10 @@
             width: 100%;
             min-width: 1200px;
         }
+		body {
+		    margin: 0;
+		    min-height: 100vh;
+		}
         .small-input {
             width: 120px;
             padding: 2px 4px;
@@ -26,6 +30,17 @@
             padding: 2px 6px;
             font-size: 12px;
         }
+		
+		
+		#wave-canvas {
+		    position: fixed;
+		    bottom: 0;
+		    left: 0;
+		    width: 100%;
+		    height: 120px; /* 海浪高度 */
+		    z-index:0;
+			opacity:0;
+		}
     </style>
 		<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
 		<!-- <link href="font-awesome.min.css.css" rel="stylesheet"> -->
@@ -629,7 +644,11 @@
                     link = processJdAuthLink(link, isJdTrial);
                 }
 				if (platform === 'tmall'||platform === 'taobao') {
-				    $("#tmsqts").show()
+				    $("#tmsqts").text("*天猫授权需先维护商品!");
+					$("#tmsqts").show();
+                }else if(platform === 'tmall'||platform === 'jd') {
+				    $("#tmsqts").text("*京东需要提醒客户开启自开服务！");
+					$("#tmsqts").show()
                 }else{
 					$("#tmsqts").hide()
 				}
@@ -755,6 +774,7 @@
             const date = new Date();
             return date.toISOString().split('T')[0];
         }
+		
     </script>
 	</head>
 	<body class="bg-gray-50 min-h-screen py-6">
@@ -852,7 +872,7 @@
 					<!-- 授权话术模块 -->
 					<div id="authTab" class="main-content hidden bg-white rounded-xl shadow-md p-6 mb-6">
 						<h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-							<i class="fa fa-lock text-indigo-500 mr-2"></i>授权话术生成&nbsp;&nbsp;<span id="tmsqts" style="color: red;font-size: 10px;" hidden >*天猫授权需先维护商品</span>
+							<i class="fa fa-lock text-indigo-500 mr-2"></i>授权话术生成&nbsp;&nbsp;<span id="tmsqts" style="color: red;font-size: 10px;" hidden ></span>
 						</h2>
 
 						<div class="space-y-4">
@@ -1008,5 +1028,56 @@
 				</div>
 			</div>
 		</div>
+		<canvas id="wave-canvas"></canvas>
 	</body>
+	<script>
+		 const canvas = document.getElementById('wave-canvas');
+		        const ctx = canvas.getContext('2d');
+		        let canvasWidth = window.innerWidth;
+		        let canvasHeight = canvas.offsetHeight;
+		
+		        // 初始化 Canvas 尺寸（适配窗口）
+		        function resizeCanvas() {
+		            canvasWidth = window.innerWidth;
+		            canvas.height = canvasHeight;
+		            canvas.width = canvasWidth;
+		        }
+		        resizeCanvas();
+		        window.addEventListener('resize', resizeCanvas);
+		
+		        // 波浪配置（可调整参数）
+		        const waves = [
+		            { y: canvasHeight * 0.6, amplitude: 15, speed: 0.004, color: 'rgba(120, 200, 255, 0.8)' },
+					{ y: canvasHeight * 0.8, amplitude: 10, speed: 0.001, color: 'rgba(0, 85, 255, 0.6)' },
+		            { y: canvasHeight * 0.7, amplitude: 25, speed: 0.006, color: 'rgba(80, 180, 255, 0.6)' },
+		        ];
+		
+		        // 绘制波浪
+		        function drawWaves() {
+		            ctx.clearRect(0, 0, canvasWidth, canvasHeight); // 清空画布
+		
+		            waves.forEach(wave => {
+		                ctx.beginPath();
+		                ctx.moveTo(0, wave.y);
+		
+		                // 用正弦函数绘制波浪曲线（x从0到画布宽度，y随正弦变化）
+		                for (let x = 0; x < canvasWidth; x++) {
+		                    const y = wave.y + Math.sin(x * 0.01 + Date.now() * wave.speed) * wave.amplitude;
+		                    ctx.lineTo(x, y);
+		                }
+		
+		                // 闭合路径（从画布底部回到起点）
+		                ctx.lineTo(canvasWidth, canvasHeight);
+		                ctx.lineTo(0, canvasHeight);
+		                ctx.closePath();
+		                ctx.fillStyle = wave.color;
+		                ctx.fill();
+		            });
+		
+		            requestAnimationFrame(drawWaves); // 循环绘制（每秒约60次）
+		        }
+		
+		        // 启动动画
+		        drawWaves();
+	</script>
 </html>

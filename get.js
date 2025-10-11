@@ -15,15 +15,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		"你这么闲的话，就去多搬几块砖",
 		"点我很好玩？",
 		"点我有彩蛋哦",
+		"哦~大海",
 		"王侯将相，宁有种乎",
 		"是谁创造了这个世界，使我们劳动群众 —— 国际歌",
 		"一切归劳动者所有，哪能容得寄生虫 —— 国际歌",
 		"起来饥寒交迫的奴隶，起来全世界受苦的人 —— 国际歌",
 		"不要看他说了什么，要看他做了什么",
 		"三分钟热度，也有三分钟收获",
-		"不会从失败中寻求教训的人通向成功的道路是遥远的 —— 拿破仑",
-		"除了初秋的一场泪雨，能省的，都要省下来 —— 许立志",
-		"科学的造物，居然要在信仰中寻求答案 —— 莫伊拉",
     ];
 
     // 找到"特别说明"元素（假设其id为"specialNote"，如果实际id不同请修改）
@@ -49,6 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 const randomIndex = Math.floor(Math.random() * famousQuotes.length);
                 quoteElement.textContent = famousQuotes[randomIndex];
+				console.log(randomIndex)
+				if(randomIndex==13){
+					const w=document.getElementById('wave-canvas');
+					w.style.opacity='1';//将海浪的背景颜色改为显示
+				}
                 quoteElement.style.opacity = '1';
             }, 300);
         }
@@ -63,13 +66,14 @@ document.addEventListener('DOMContentLoaded', function() {
         specialNote.style.cursor = 'pointer';
         specialNote.title = '点击刷新名言';
     }else{
-		alert("wcnm")
+		alert("哎呀，网页崩溃了，刷新试试看")
 	}
 });
 
 // 获取店铺信息的主函数
 async function getDPXX() {
     // 初始化变量（优先从URL参数获取，无参数则用默认值）
+    const urlParams = getUrlParams();
     const dpmc = localStorage.getItem("dpmc");//店铺名称
     const dppt = localStorage.getItem("pt"); // 店铺类型
     let token = localStorage.getItem("youtoken");
@@ -152,3 +156,18 @@ async function getDPXX() {
         };
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
