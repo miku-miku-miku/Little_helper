@@ -33,13 +33,13 @@
 		
 		
 		#wave-canvas {
-		    position: fixed;
-		    bottom: 0;
-		    left: 0;
-		    width: 100%;
-		    height: 120px; /* 海浪高度 */
-		    z-index:0;
 			opacity:0;
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: 120px; /* 海浪高度 */
+			z-index: -1;
 		}
     </style>
 		<link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -1032,52 +1032,210 @@
 	</body>
 	<script>
 		 const canvas = document.getElementById('wave-canvas');
-		        const ctx = canvas.getContext('2d');
-		        let canvasWidth = window.innerWidth;
-		        let canvasHeight = canvas.offsetHeight;
-		
-		        // 初始化 Canvas 尺寸（适配窗口）
-		        function resizeCanvas() {
-		            canvasWidth = window.innerWidth;
-		            canvas.height = canvasHeight;
-		            canvas.width = canvasWidth;
-		        }
-		        resizeCanvas();
-		        window.addEventListener('resize', resizeCanvas);
-		
-		        // 波浪配置（可调整参数）
-		        const waves = [
-		            { y: canvasHeight * 0.6, amplitude: 15, speed: 0.004, color: 'rgba(120, 200, 255, 0.8)' },
-					{ y: canvasHeight * 0.8, amplitude: 10, speed: 0.001, color: 'rgba(0, 85, 255, 0.6)' },
-		            { y: canvasHeight * 0.7, amplitude: 25, speed: 0.006, color: 'rgba(80, 180, 255, 0.6)' },
-		        ];
-		
-		        // 绘制波浪
-		        function drawWaves() {
-		            ctx.clearRect(0, 0, canvasWidth, canvasHeight); // 清空画布
-		
-		            waves.forEach(wave => {
-		                ctx.beginPath();
-		                ctx.moveTo(0, wave.y);
-		
-		                // 用正弦函数绘制波浪曲线（x从0到画布宽度，y随正弦变化）
-		                for (let x = 0; x < canvasWidth; x++) {
-		                    const y = wave.y + Math.sin(x * 0.01 + Date.now() * wave.speed) * wave.amplitude;
-		                    ctx.lineTo(x, y);
-		                }
-		
-		                // 闭合路径（从画布底部回到起点）
-		                ctx.lineTo(canvasWidth, canvasHeight);
-		                ctx.lineTo(0, canvasHeight);
-		                ctx.closePath();
-		                ctx.fillStyle = wave.color;
-		                ctx.fill();
-		            });
-		
-		            requestAnimationFrame(drawWaves); // 循环绘制（每秒约60次）
-		        }
-		
-		        // 启动动画
-		        drawWaves();
+		 const ctx = canvas.getContext('2d');
+		 let canvasWidth = window.innerWidth;
+		 let canvasHeight = canvas.offsetHeight;
+		 
+		 // 初始化 Canvas 尺寸（适配窗口）
+		 function resizeCanvas() {
+		     canvasWidth = window.innerWidth;
+		     canvas.height = canvasHeight;
+		     canvas.width = canvasWidth;
+		 }
+		 resizeCanvas();
+		 window.addEventListener('resize', resizeCanvas);
+		 
+		 // 波浪配置（可调整参数）
+		 const waves = [
+		     { y: canvasHeight * 0.6, amplitude: 15, speed: 0.004, color: 'rgba(120, 200, 255, 0.8)' },
+		     { y: canvasHeight * 0.8, amplitude: 10, speed: 0.001, color: 'rgba(0, 85, 255, 0.6)' },
+		     { y: canvasHeight * 0.7, amplitude: 25, speed: 0.006, color: 'rgba(80, 180, 255, 0.6)' },
+		 ];
+		 
+		 // 海鸥类
+		 class Seagull {
+		     constructor() {
+		         this.reset();
+		     }
+		 
+		     reset() {
+		         // 随机初始位置和方向
+		         this.direction = -1; // 1: 向右, -1: 向左
+		         this.x = this.direction === 1 ? -50 : canvasWidth + 50;
+		         this.y = Math.random() * (canvasHeight * 0.4);
+		         this.size = 15 + Math.random() * 10;
+		         this.speed = (1 + Math.random() * 2) * this.direction; // 速度包含方向
+		         this.angle = 0;
+		         this.angleSpeed = 0.1 + Math.random() * 0.1;
+		     }
+		 
+		     update() {
+		         // 移动逻辑 - 使用固定方向移动
+		         this.x += this.speed;
+		         
+		         // 超出边界后重置
+		         if (this.x < -50 || this.x > canvasWidth + 50) {
+		             this.reset();
+		         }
+		 
+		         // 翅膀煽动动画
+		         this.angle += this.angleSpeed;
+		     }
+		 
+		     draw() {
+		         ctx.save();
+		         ctx.translate(this.x, this.y);
+		         
+		         // 根据移动方向翻转
+		         if (this.direction === -1) {
+		             ctx.scale(-1, 1);
+		         }
+		 
+		         // 绘制海鸥身体
+		         ctx.fillStyle = 'rgba(221, 221, 221, 0.8)';
+		         ctx.beginPath();
+		         ctx.ellipse(0, 0, this.size * 0.3, this.size * 0.2, 0, 0, Math.PI * 2);
+		         ctx.fill();
+		 
+		         // 绘制翅膀
+		         const wingAngle = Math.sin(this.angle) * 0.5;
+		         ctx.beginPath();
+		         ctx.moveTo(0, 0);
+		         ctx.lineTo(this.size * 0.8, this.size * wingAngle);
+		         ctx.lineTo(this.size * 0.3, this.size * 0.1);
+		         ctx.closePath();
+		         ctx.fill();
+		 
+		         // 绘制头部和嘴
+		         ctx.beginPath();
+		         ctx.arc(this.size * 0.3, 0, this.size * 0.2, 0, Math.PI * 2);
+		         ctx.fill();
+		         
+		         ctx.fillStyle = 'orange';
+		         ctx.beginPath();
+		         ctx.moveTo(this.size * 0.5, 0);
+		         ctx.lineTo(this.size * 0.7, this.size * -0.05);
+		         ctx.lineTo(this.size * 0.5, this.size * 0.05);
+		         ctx.closePath();
+		         ctx.fill();
+		 
+		         ctx.restore();
+		     }
+		 }
+		 
+		 // 鱼类
+		 class Fish {
+		     constructor() {
+		         this.reset();
+		     }
+		 
+		     reset() {
+		         // 随机初始位置和方向
+		         this.direction =  -1; // 1: 向右, -1: 向左
+		         this.x = this.direction === 1 ? -50 : canvasWidth + 50;
+		         this.y = canvasHeight * 0.6 + Math.random() * (canvasHeight * 0.9);
+		         this.size = 10 + Math.random() * 15;
+		         this.speed = (0.5 + Math.random() * 1.5) * this.direction; // 速度包含方向
+		         this.angle = 0;
+		         this.angleSpeed = 0.15 + Math.random() * 0.15;
+		     }
+		 
+		     update() {
+		         // 移动逻辑 - 使用固定方向移动
+		         this.x += this.speed;
+		         
+		         // 超出边界后重置
+		         if (this.x < -50 || this.x > canvasWidth + 50) {
+		             this.reset();
+		         }
+		 
+		         // 鱼鳍摆动动画
+		         this.angle += this.angleSpeed;
+		     }
+		 
+		     draw() {
+		         ctx.save();
+		         ctx.translate(this.x, this.y);
+		         
+		         // 根据移动方向翻转
+		         if (this.direction === -1) {
+		             ctx.scale(-1, 1);
+		         }
+		 
+		         // 绘制鱼身体
+		         ctx.fillStyle = 'rgba(255, 165, 0, 0.8)';
+		         ctx.beginPath();
+		         ctx.ellipse(0, 0, this.size * 0.6, this.size * 0.3, 0, 0, Math.PI * 2);
+		         ctx.fill();
+		 
+		         // 绘制鱼尾
+		         ctx.beginPath();
+		         ctx.moveTo(this.size * 0.6, 0);
+		         ctx.lineTo(this.size * 0.9, this.size * -0.2);
+		         ctx.lineTo(this.size * 0.9, this.size * 0.2);
+		         ctx.closePath();
+		         ctx.fill();
+		 
+		         // 绘制鱼鳍
+		         const finAngle = Math.sin(this.angle) * 0.3;
+		         ctx.beginPath();
+		         ctx.moveTo(this.size * -0.2, 0);
+		         ctx.lineTo(this.size * 0.2, this.size * (finAngle - 0.3));
+		         ctx.lineTo(this.size * 0.1, 0);
+		         ctx.closePath();
+		         ctx.fill();
+		 
+		         // 绘制眼睛
+		         ctx.fillStyle = 'black';
+		         ctx.beginPath();
+		         ctx.arc(this.size * 0.3, 0, this.size * 0.08, 0, Math.PI * 2);
+		         ctx.fill();
+		 
+		         ctx.restore();
+		     }
+		 }
+		 
+		 // 创建多个海鸥和鱼
+		 const seagulls = Array(3).fill().map(() => new Seagull());
+		 const fishes = Array(4).fill().map(() => new Fish());
+		 
+		 // 绘制所有元素
+		 function drawAll() {
+		     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+		 
+		     // 绘制海浪
+		     waves.forEach(wave => {
+		         ctx.beginPath();
+		         ctx.moveTo(0, wave.y);
+		 
+		         for (let x = 0; x < canvasWidth; x++) {
+		             const y = wave.y + Math.sin(x * 0.01 + Date.now() * wave.speed) * wave.amplitude;
+		             ctx.lineTo(x, y);
+		         }
+		 
+		         ctx.lineTo(canvasWidth, canvasHeight);
+		         ctx.lineTo(0, canvasHeight);
+		         ctx.closePath();
+		         ctx.fillStyle = wave.color;
+		         ctx.fill();
+		     });
+		 
+		     // 绘制海鸥
+		     seagulls.forEach(seagull => {
+		         seagull.update();
+		         seagull.draw();
+		     });
+		 
+		     // 绘制鱼
+		     fishes.forEach(fish => {
+		         fish.update();
+		         fish.draw();
+		     });
+		 
+		     requestAnimationFrame(drawAll);
+		 }
+		 
+		 // 启动动画
+		 drawAll();
 	</script>
 </html>
