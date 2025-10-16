@@ -72,8 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 获取店铺信息的主函数
 async function getDPXX() {
-    // 初始化变量（优先从URL参数获取，无参数则用默认值）
-    const urlParams = getUrlParams();
     const dpmc = localStorage.getItem("dpmc");//店铺名称
     const dppt = localStorage.getItem("pt"); // 店铺类型
     let token = localStorage.getItem("youtoken");
