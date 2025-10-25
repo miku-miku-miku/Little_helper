@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				if(randomIndex==13){
 					const w=document.getElementById('wave-canvas');
 					w.style.opacity='1';//将海浪的背景颜色改为显示
+					const yzs=document.getElementById('yzs');
+					yzs.style.opacity='1';//将海浪的背景颜色改为显示
 				}
                 quoteElement.style.opacity = '1';
             }, 300);
