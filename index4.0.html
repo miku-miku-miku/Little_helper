@@ -55,6 +55,7 @@
 		<!-- <link href="font-awesome.min.css.css" rel="stylesheet"> -->
 		<script>
 			$(function(){
+				getnewdpxx();
 				var settings = {
 				   "url": "https://mycst.cn//NEWKP/LOGIN/GetToken?UserName=SHGLY_L&Password1=Aa@123654",
 				   "method": "POST",
@@ -76,14 +77,14 @@
 					         iframe.src = currentSrc;
 					     }, 0);
 				});
-				getnewdpxx();
+				
 				$("#getsqlj").click(async function(){//初始化获取授权链接按钮点击函数
 					getnewdpxx();
 					console.log("开始查询店铺信息...");
 					 // 等待getDPXX执行完成并返回结果
 					 const result = await getDPXX();
 					 console.log(result.data.sqwz);
-					 $("#authLink").text(result.data.sqwz);
+					 $("#authLink").val(result.data.sqwz);
 				})
 			})
 			function getnewdpxx(){
@@ -923,7 +924,7 @@
 					<!-- 订购话术模块 -->
 					<div id="orderTab" class="main-content bg-white rounded-xl shadow-md p-6 mb-6">
 						<h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-							<i class="fa fa-credit-card text-green-500 mr-2"></i>订购话术生成
+							<i class="fa fa-credit-card text-green-500 mr-2"></i>订购话术生成<span style="color: red;font-size: 12px;">抖音1499暂不支持</span>
 						</h2>
 
 						<div class="space-y-4">
