@@ -613,19 +613,22 @@
             }
             
             // 替换app_key
-            let processedLink = link.replace(/app_key=[^&]+/, `app_key=${JD_APP_KEY}`);
-            if (!processedLink.includes(`app_key=${JD_APP_KEY}`)) {
-                processedLink = processedLink.includes('redirect_uri=') 
-                    ? processedLink.replace('redirect_uri=', `app_key=${JD_APP_KEY}&redirect_uri=`) 
-                    : `${processedLink}&app_key=${JD_APP_KEY}`;
-            }
+            // 固定配置：新的app_key（替换目标值）
+                const newAppKey = '272360321C3863E8405AC6EBD57A9A64';
+                const oldAppKey = '113DA7F165F229A38EF2184C66BEA366';
             
-            // 添加后缀
-            if (!processedLink.endsWith(JD_SUFFIX)) {
-                processedLink += JD_SUFFIX;
-            }
+                // 1. 解析URL，替换app_key参数
+                let modifiedUrl = link.replace(`app_key=${oldAppKey}`, `app_key=${newAppKey}`);
             
-            return processedLink;
+                // 2. 替换redirect_uri中末尾的旧app_key
+                const redirectUriRegex = new RegExp(`(${encodeURIComponent('/oauth/')})${oldAppKey}`);
+                modifiedUrl = modifiedUrl.replace(redirectUriRegex, `$1${newAppKey}`);
+            
+                // 3. 替换state参数（原state + _新app_key）
+                const stateRegex = /(state=)([^&]+)/;
+                modifiedUrl = modifiedUrl.replace(stateRegex, `$1$2_${newAppKey}`);
+            
+                return modifiedUrl;
         }
 
         // 生成授权话术
